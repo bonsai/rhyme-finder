@@ -1,0 +1,49 @@
+openapi: 3.0.3
+info:
+  title: Rhyme Finder API
+  version: 0.1.0
+  description: Fast deterministic Japanese-friendly rhyme candidate engine.
+paths:
+  /health:
+    get:
+      responses:
+        '200':
+          description: OK
+  /v1/rhyme:
+    post:
+      summary: Find rhyme candidates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: Ranked candidates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query: { $ref: '#/components/schemas/Query' }
+                  candidates:
+                    type: array
+                    items: { $ref: '#/components/schemas/Candidate' }
+components:
+  schemas:
+    Query:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+        mode: { type: string, enum: [strict, aggressive], default: aggressive }
+        limit: { type: integer, minimum: 1, default: 20 }
+    Candidate:
+      type: object
+      properties:
+        text: { type: string }
+        score: { type: number, format: double }
+        phonetic: { type: number, format: double }
+        rhythm: { type: number, format: double }
+        position: { type: number, format: double }
